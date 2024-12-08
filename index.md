@@ -5,7 +5,7 @@ Welcome to the lab report for the sandboxed network project. This report documen
 ## Table of Contents
 - [Network Diagram](network-diagram.md)
 - [IP Address Table](ip-address-table.md)
-- [Configuration Steps](configuration-steps.md)
+- [Configuration Steps](configuration-steps.txt)
 - [Functional Test Results](functional-test-results.md)
 
 Click the links above to navigate through the report.
