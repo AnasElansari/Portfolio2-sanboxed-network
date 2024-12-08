@@ -1,4 +1,4 @@
-## Configuration Steps for Sandboxed Network Lab
+# Configuration Steps for Sandboxed Network Lab.
 
 This section details the steps to configure Virtual Machines (VMs) and their IP tables for the sandboxed network lab.
 After installing all the VM 
