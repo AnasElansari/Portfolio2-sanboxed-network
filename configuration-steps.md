@@ -1,0 +1,90 @@
+Configuration Steps for Sandboxed Network Lab
+
+This section details the steps to configure Virtual Machines (VMs) and their IP tables for the sandboxed network lab.
+After installing all the VM 
+Each VM requires specific network settings to ensure proper communication. Configure the network interfaces in VirtualBox as follows: 
+1. Desktop VM: 
+- Adapter 1: Internal Network (Subnet 1). 
+2. Application Server VM: 
+- Adapter 1: Internal Network (Subnet 2).
+3. Gateway VM: 
+- Adapter 1: NAT (for Internet access). 
+- Adapter 2: Internal Network (Subnet 1). 
+- Adapter 3: Internal Network (Subnet 2). 
+
+
+1.	Configuring the Desktop VM
+Network Configuration
+1. Log in the Desktop VM 
+2. Set a Static IP:
+Open the Terminal 
+  - Open the network configuration file:
+ sudo nano /etc/network/interfaces
+  - Add the following configuration:
+  auto enp0s3
+  iface enp0s3 inet static
+  address 192.168.5.10
+  netmask 255.255.255.0
+  gateway 192.168.5.1
+   - Save and exit. 
+3. Restart Networking:
+   sudo systemctl restart networking
+
+2.	Configuring the Application Server VM
+Network Configuration
+1. Log in the Application Server VM.
+2. Set a Static IP:
+  - Open the network configuration file:
+sudo nano /etc/network/interfaces
+  - Add the following configuration:
+auto enp0s3
+iface enp0s3 inet static
+address 192.168.105.10
+netmask 255.255.255.0
+gateway 192.168.105.1
+  - Save and exit.
+
+3.	Configuring the Gateway VM
+Network Interfaces Setup
+VirtualBox Settings:
+Set Adapter 1 to NAT (for Internet access).
+Set Adapter 2 to Internal Network with network name Subnet1.
+Set Adapter 3 to Internal Network with network name Subnet2.
+1. Log in the Gateway VM.
+Configure Network Interfaces:
+ - Open the network configuration file:
+sudo nano /etc/network/interfaces
+ - Add the following configurations:
+auto enp0s3
+iface enp0s3 inet dhcp
+auto enp0s8
+iface enp0s8 inet static
+address 192.168.5.1
+netmask 255.255.255.0
+auto enp0s9
+iface enp0s9 inet static
+address 192.168.105.1
+netmask 255.255.255.0
+Save and exit.
+ - Restart Networking:
+sudo systemctl restart networking
+ - Enable IP Forwarding
+Edit sysctl.conf:
+sudo nano /etc/sysctl.conf
+Uncomment the line:
+net.ipv4.ip_forward=1
+Apply Changes:
+sudo sysctl -p
+  - Configure NAT with iptables
+Set up NAT for Subnet 1 and Subnet 2:
+sudo iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
+Allow Forwarding Between Subnets:
+sudo iptables -A FORWARD -i enp0s8 -o enp0s3 -j ACCEPT
+sudo iptables -A FORWARD -i enp0s9 -o enp0s3 -j ACCEPT
+sudo iptables -A FORWARD -i enp0s8 -o enp0s9 -j ACCEPT
+sudo iptables -A FORWARD -i enp0s9 -o enp0s8 -j ACCEPT
+Save iptables Rules:
+For Ubuntu:
+sudo apt install iptables-persistent
+sudo netfilter-persistent save
+sudo netfilter-persistent reload
